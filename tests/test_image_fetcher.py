@@ -7,12 +7,12 @@ from unittest.mock import MagicMock, AsyncMock
 # Add project root to sys.path
 sys.path.append(str(Path(__file__).parent.parent))
 
-from agents.jarvis.tools.image_fetcher import load_meme_image_to_artifact
+from agents.meme_agent.tools.image_fetcher import fetch_image_tool
 from google.adk.tools.tool_context import ToolContext
 from google.genai import types
 
 async def test_fetch_image():
-    print("Testing load_meme_image_to_artifact...")
+    print("Testing fetch_image_tool...")
     
     # Mock InvocationContext
     mock_invocation_context = MagicMock()
@@ -28,10 +28,10 @@ async def test_fetch_image():
     # Create ToolContext with mocked InvocationContext
     tool_context = ToolContext(invocation_context=mock_invocation_context)
     
-    # Test meme name (10 Guy template)
-    meme_name = "10-Guy"
+    # Test meme filename (10 Guy template)
+    image_filename = "10-Guy.jpg"
     
-    result = await load_meme_image_to_artifact(meme_name, tool_context)
+    result = await fetch_image_tool.func(image_filename, tool_context)
     print(f"Result: {result}")
     
     # Verify save_artifact was called

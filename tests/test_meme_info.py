@@ -4,11 +4,11 @@ from pathlib import Path
 # Add project root to sys.path to import agents
 sys.path.append(str(Path(__file__).parent.parent))
 
-from agents.jarvis.tools.meme_info import get_meme_templates_info
+from agents.meme_agent.tools.meme_info import meme_info_tool
 
 def test_get_meme_templates_info():
-    print("Testing get_meme_templates_info...")
-    results = get_meme_templates_info()
+    print("Testing meme_info_tool...")
+    results = meme_info_tool.func()
     
     if not results:
         print("FAIL: No results returned.")

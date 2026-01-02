@@ -36,6 +36,9 @@ def create_app() -> FastAPI:
   # Check for .env in root
   load_standard_env_files(repo_root=repo_root, agent_dir=Path("."))
 
+  # Register custom artifact services
+  import agents.services
+
   session_service_uri = to_asyncpg_sqlalchemy_url(require_env("DATABASE_URL"))
 
   # Use globalfile artifact service to share artifacts across all users/sessions

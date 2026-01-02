@@ -6,7 +6,6 @@ from google.adk.models.lite_llm import LiteLlm
 from google.adk.tools import load_artifacts
 from .tools.meme_info import meme_info_tool
 from .tools.image_fetcher import fetch_image_tool
-from .sub_agents.researcher import researcher_agent
 
 api_base_url = "https://openrouter.ai/api/v1"
 

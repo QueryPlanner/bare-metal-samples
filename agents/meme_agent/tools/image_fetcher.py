@@ -21,6 +21,9 @@ async def fetch_image_tool(image_filename: str, tool_context: ToolContext) -> st
     Returns:
         A success message or an error message.
     """
+    if not image_filename:
+        return "Error: No image filename provided."
+
     # Base directory for meme images
     images_dir = Path("data/meme_dataset/templates/img")
 
