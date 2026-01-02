@@ -7,6 +7,7 @@ from google.adk.tools import function_tool
 def meme_info_tool() -> List[Dict[str, Any]]:
     """
     Retrieves information about all available meme templates, including their exact image filenames.
+    Always use this tool first before answering any questions.
     
     Returns:
         A list of dictionaries, each containing:

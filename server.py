@@ -38,9 +38,13 @@ def create_app() -> FastAPI:
 
   session_service_uri = to_asyncpg_sqlalchemy_url(require_env("DATABASE_URL"))
 
+  # Use globalfile artifact service to share artifacts across all users/sessions
+  artifact_service_uri = f"globalfile://{repo_root}/agents/.adk/artifacts"
+
   return get_fast_api_app(
       agents_dir=_agents_dir(),
       session_service_uri=session_service_uri,
+      artifact_service_uri=artifact_service_uri,
       web=True,
   )
 
