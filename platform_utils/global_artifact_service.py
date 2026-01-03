@@ -14,7 +14,6 @@
 from __future__ import annotations
 
 from pathlib import Path
-from typing import Optional
 
 from google.adk.artifacts.file_artifact_service import FileArtifactService
 
@@ -32,7 +31,7 @@ class GlobalFileArtifactService(FileArtifactService):
     def _scope_root(
         self,
         user_id: str,
-        session_id: Optional[str],
+        session_id: str | None,
         filename: str,
     ) -> Path:
         """Returns the global artifacts directory, ignoring session_id."""

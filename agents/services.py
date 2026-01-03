@@ -1,7 +1,10 @@
 from pathlib import Path
-from urllib.parse import urlparse, unquote
+from urllib.parse import unquote, urlparse
+
 from google.adk.cli.service_registry import get_service_registry
+
 from platform_utils.global_artifact_service import GlobalFileArtifactService
+
 
 def global_file_artifact_factory(uri: str, **kwargs):
     parsed_uri = urlparse(uri)

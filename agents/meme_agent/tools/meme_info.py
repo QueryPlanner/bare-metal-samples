@@ -1,10 +1,12 @@
 import json
 import random
 from pathlib import Path
-from typing import List, Dict, Any
+from typing import Any
+
 from google.adk.tools import function_tool
 
-def meme_info_tool() -> List[Dict[str, Any]]:
+
+def meme_info_tool() -> list[dict[str, Any]]:
     """
     Retrieves information about all available meme templates, including their exact image filenames.
     Always use this tool first before answering any questions.
@@ -31,9 +33,9 @@ def meme_info_tool() -> List[Dict[str, Any]]:
 
     for template_file in sorted(templates_dir.glob("*.json")):
         try:
-            with open(template_file, "r") as f:
+            with open(template_file) as f:
                 template_data = json.load(f)
-        except (json.JSONDecodeError, IOError):
+        except (OSError, json.JSONDecodeError):
             continue
         
         stem = template_file.stem
@@ -57,7 +59,7 @@ def meme_info_tool() -> List[Dict[str, Any]]:
         examples = []
         if meme_file.exists():
             try:
-                with open(meme_file, "r") as f:
+                with open(meme_file) as f:
                     meme_data = json.load(f)
                 
                 if isinstance(meme_data, list) and meme_data:
@@ -66,7 +68,7 @@ def meme_info_tool() -> List[Dict[str, Any]]:
                     for m in sampled_memes:
                         if isinstance(m, dict) and "boxes" in m:
                             examples.append(m["boxes"])
-            except (json.JSONDecodeError, IOError):
+            except (OSError, json.JSONDecodeError):
                 pass
         
         results.append({

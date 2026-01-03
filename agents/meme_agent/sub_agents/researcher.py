@@ -1,6 +1,8 @@
 import os
+
 from google.adk.agents.llm_agent import Agent
 from google.adk.models.lite_llm import LiteLlm
+
 
 def researcher_agent() -> Agent:
     # Shared model config (could be different for this agent)

@@ -2,6 +2,7 @@ from pathlib import Path
 
 from google.adk.tools import ToolContext, function_tool
 from google.genai import types
+from PIL import Image
 
 
 async def fetch_image_tool(image_filename: str, tool_context: ToolContext) -> str:
@@ -19,7 +20,7 @@ async def fetch_image_tool(image_filename: str, tool_context: ToolContext) -> st
         tool_context: Internal context for artifact management.
 
     Returns:
-        A success message or an error message.
+        A success message with image dimensions or an error message.
     """
     if not image_filename:
         return "Error: No image filename provided."
@@ -41,6 +42,10 @@ async def fetch_image_tool(image_filename: str, tool_context: ToolContext) -> st
         # Read the image file
         image_data = image_path.read_bytes()
 
+        # Get image dimensions
+        with Image.open(image_path) as img:
+            width, height = img.size
+
         # Determine mime type
         ext = image_path.suffix.lower()
         mime_type = "image/jpeg" if ext in [".jpg", ".jpeg"] else "image/png"
@@ -55,7 +60,8 @@ async def fetch_image_tool(image_filename: str, tool_context: ToolContext) -> st
 
         return (
             f"Successfully loaded '{filename}' from local dataset as artifact "
-            f"(version {version}). You can now use 'load_artifacts' to view it."
+            f"(version {version}). Dimensions: {width}x{height} (Width x Height). "
+            "You can now use 'load_artifacts' to view it."
         )
 
     except Exception as e:

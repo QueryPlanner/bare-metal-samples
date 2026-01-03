@@ -17,7 +17,6 @@ from google.adk.cli.fast_api import get_fast_api_app
 from platform_utils.db_url import to_asyncpg_sqlalchemy_url
 from platform_utils.env import load_standard_env_files, require_env
 
-
 DEFAULT_HOST = "127.0.0.1"
 DEFAULT_PORT = 8000
 
@@ -37,7 +36,6 @@ def create_app() -> FastAPI:
   load_standard_env_files(repo_root=repo_root, agent_dir=Path("."))
 
   # Register custom artifact services
-  import agents.services
 
   session_service_uri = to_asyncpg_sqlalchemy_url(require_env("DATABASE_URL"))
 

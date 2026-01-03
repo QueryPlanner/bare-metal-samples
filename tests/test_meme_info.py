@@ -6,6 +6,7 @@ sys.path.append(str(Path(__file__).parent.parent))
 
 from agents.meme_agent.tools.meme_info import meme_info_tool
 
+
 def test_get_meme_templates_info():
     print("Testing meme_info_tool...")
     results = meme_info_tool.func()
@@ -21,7 +22,7 @@ def test_get_meme_templates_info():
         print(f"\nTemplate {i+1}:")
         print(f"  Name: {item['name']}")
         print(f"  Alt Names: {item['alternative_names']}")
-        print(f"  Examples (up to 3):")
+        print("  Examples (up to 3):")
         for j, example in enumerate(item['examples']):
             print(f"    {j+1}: {example}")
 
