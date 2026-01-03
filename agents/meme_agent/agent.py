@@ -31,6 +31,8 @@ root_agent = Agent(
     you have saved.
     You can also add text overlays to images using 'add_text_to_image_tool'. Use Impact font 
     and provide locations (top-left coordinates), texts, and font sizes.
+
+    After you create the meme load it again and verify the text and quality, if not good create again.
     """,
     # Register the sub-agent structurally
     # sub_agents=[researcher_agent()],

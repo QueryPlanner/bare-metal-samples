@@ -74,8 +74,10 @@ async def add_text_to_image(
                 # Position text at the top-left of the provided location
                 text_position = (loc[0], loc[1])
                 
-                # Draw black text (no background, no bounding box)
-                draw.text(text_position, text, fill="black", font=font)
+                # Draw white text with black border (stroke)
+                # Stroke width is heuristic, e.g., size // 15
+                stroke_width = max(1, size // 15)
+                draw.text(text_position, text, fill="white", font=font, stroke_width=stroke_width, stroke_fill="black")
             
             # Save to bytes
             img_byte_arr = io.BytesIO()
