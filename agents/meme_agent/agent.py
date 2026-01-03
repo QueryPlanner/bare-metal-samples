@@ -6,7 +6,7 @@ from google.adk.models.lite_llm import LiteLlm
 # Import tools and sub-agents
 from google.adk.tools import load_artifacts
 
-from .tools.image_editor import draw_bounding_box_tool
+from .tools.image_editor import add_text_to_image_tool
 from .tools.image_fetcher import fetch_image_tool
 from .tools.meme_info import meme_info_tool
 
@@ -29,10 +29,11 @@ root_agent = Agent(
     To view or analyze saved artifacts (like images), you MUST use 'load_artifacts'.
     Always use the 'load_artifacts' right after 'fetch_image_tool' tool to view the images
     you have saved.
-    You can also draw bounding boxes and text on images using 'draw_bounding_box_tool'.
+    You can also add text overlays to images using 'add_text_to_image_tool'. Use Impact font 
+    and provide locations (top-left coordinates), texts, and font sizes.
     """,
     # Register the sub-agent structurally
     # sub_agents=[researcher_agent()],
     # Give the agent tools to do its job (including transferring)
-    tools=[meme_info_tool, fetch_image_tool, load_artifacts, draw_bounding_box_tool],
+    tools=[meme_info_tool, fetch_image_tool, load_artifacts, add_text_to_image_tool],
 )

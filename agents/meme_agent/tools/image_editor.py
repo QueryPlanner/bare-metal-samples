@@ -6,21 +6,21 @@ from google.genai import types
 from PIL import Image, ImageDraw, ImageFont
 
 
-async def draw_bounding_box(
+async def add_text_to_image(
     image_filename: str,
-    boxes: list[list[int]],
+    text_locations: list[list[int]],
     texts: list[str],
     font_sizes: list[int],
     tool_context: ToolContext
 ) -> str:
     """
-    Draws up to 4 bounding boxes with text of specified sizes on a meme template image.
+    Adds up to 4 text overlays on a meme template image using Impact font.
 
     Args:
         image_filename: The filename of the image (must be in data/meme_dataset/templates/img).
-        boxes: A list of bounding boxes, where each box is a list of 4 integers 
-            [x_min, y_min, x_max, y_max]. Max 4 boxes.
-        texts: A list of strings corresponding to each box.
+        text_locations: A list of locations, where each location is a list of 2 or 4 integers 
+            [x, y] or [x_min, y_min, x_max, y_max]. If 4 integers, top-left is used. Max 4.
+        texts: A list of strings corresponding to each location.
         font_sizes: A list of integers specifying the font size for each text.
         tool_context: Internal context for artifact management.
 
@@ -30,14 +30,14 @@ async def draw_bounding_box(
     if not image_filename:
         return "Error: No image filename provided."
     
-    if not boxes or not texts or not font_sizes:
-         return "Error: boxes, texts, and font_sizes must be provided."
+    if not text_locations or not texts or not font_sizes:
+         return "Error: text_locations, texts, and font_sizes must be provided."
 
-    if len(boxes) > 4:
-        return "Error: You can provide at most 4 bounding boxes."
+    if len(text_locations) > 4:
+        return "Error: You can provide at most 4 text overlays."
 
-    if not (len(boxes) == len(texts) == len(font_sizes)):
-        return "Error: The number of boxes, texts, and font_sizes must match."
+    if not (len(text_locations) == len(texts) == len(font_sizes)):
+        return "Error: The number of locations, texts, and font_sizes must match."
 
     # Base directory for meme images
     images_dir = Path("data/meme_dataset/templates/img")
@@ -45,6 +45,9 @@ async def draw_bounding_box(
 
     if not image_path.exists():
         return f"Error: Image '{image_filename}' not found in {images_dir}."
+
+    # Font path
+    font_path = "Impact.ttf"
 
     try:
         with Image.open(image_path) as img:
@@ -54,28 +57,25 @@ async def draw_bounding_box(
             
             draw = ImageDraw.Draw(img)
             
-            for box, text, size in zip(boxes, texts, font_sizes):
-                if len(box) != 4:
-                    return f"Error: Invalid box coordinates {box}. Must be [x_min, y_min, x_max, y_max]."
+            for loc, text, size in zip(text_locations, texts, font_sizes):
+                if len(loc) not in [2, 4]:
+                    return f"Error: Invalid location {loc}. Must be [x, y] or [x_min, y_min, x_max, y_max]."
                 
-                # Draw bounding box
-                # Outline color red, width 3
-                draw.rectangle(box, outline="red", width=3)
-                
-                # Load font with specified size
+                # Use Impact font if available
                 try:
-                    font = ImageFont.load_default(size=size)
-                except TypeError:
-                     # Fallback for older Pillow versions if size param not supported (though we have 12.1.0)
-                     font = ImageFont.load_default()
+                    font = ImageFont.truetype(font_path, size=size)
+                except Exception:
+                     # Fallback to default if Impact.ttf fails for some reason
+                     try:
+                         font = ImageFont.load_default(size=size)
+                     except TypeError:
+                         font = ImageFont.load_default()
 
-                # Position text at the top-left of the box
-                text_position = (box[0] + 5, box[1] + 5)
+                # Position text at the top-left of the provided location
+                text_position = (loc[0], loc[1])
                 
-                # Draw text with a background for visibility
-                bbox = draw.textbbox(text_position, text, font=font)
-                draw.rectangle(bbox, fill="black")
-                draw.text(text_position, text, fill="white", font=font)
+                # Draw black text (no background, no bounding box)
+                draw.text(text_position, text, fill="black", font=font)
             
             # Save to bytes
             img_byte_arr = io.BytesIO()
@@ -84,7 +84,7 @@ async def draw_bounding_box(
             image_data = img_byte_arr.read()
             
             # Create artifact
-            filename = f"annotated_{image_filename}"
+            filename = f"text_added_{image_filename}"
             artifact_part = types.Part(
                 inline_data=types.Blob(mime_type="image/jpeg", data=image_data)
             )
@@ -94,7 +94,7 @@ async def draw_bounding_box(
             )
 
             return (
-                f"Successfully drew {len(boxes)} bounding boxes and texts on '{image_filename}'. "
+                f"Successfully added {len(texts)} text overlays on '{image_filename}'. "
                 f"Saved as artifact '{filename}' (version {version}). "
                 "Use 'load_artifacts' to view it."
             )
@@ -102,4 +102,4 @@ async def draw_bounding_box(
     except Exception as e:
         return f"Error processing image: {str(e)}"
 
-draw_bounding_box_tool = function_tool.FunctionTool(draw_bounding_box)
+add_text_to_image_tool = function_tool.FunctionTool(add_text_to_image)

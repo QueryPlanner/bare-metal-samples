@@ -6,11 +6,11 @@ from unittest.mock import MagicMock, AsyncMock, patch
 # Add project root to sys.path
 sys.path.append(str(Path(__file__).parent.parent))
 
-from agents.meme_agent.tools.image_editor import draw_bounding_box_tool, draw_bounding_box
+from agents.meme_agent.tools.image_editor import add_text_to_image_tool, add_text_to_image
 from google.adk.tools.tool_context import ToolContext
 from PIL import Image
 
-async def test_draw_bounding_box_success():
+async def test_add_text_to_image_success():
     # Setup
     tool_context = MagicMock(spec=ToolContext)
     tool_context.save_artifact = AsyncMock(return_value="v1")
@@ -29,26 +29,26 @@ async def test_draw_bounding_box_success():
         mock_img.save.side_effect = side_effect_save
         mock_open.return_value.__enter__.return_value = mock_img
         
-        # Execute with 2 boxes
-        result = await draw_bounding_box(
+        # Execute with 2 text overlays
+        result = await add_text_to_image(
             image_filename="Test.jpg",
-            boxes=[[10, 10, 50, 50], [60, 60, 90, 90]],
+            text_locations=[[10, 10], [60, 60]],
             texts=["Meme 1", "Meme 2"],
             font_sizes=[20, 15],
             tool_context=tool_context
         )
         
         # Verify
-        assert "Successfully drew 2 bounding boxes" in result
+        assert "Successfully added 2 text overlays" in result
         assert "Test.jpg" in result
         tool_context.save_artifact.assert_called_once()
         
         # Verify args to save_artifact
         call_kwargs = tool_context.save_artifact.call_args.kwargs
-        assert call_kwargs['filename'] == "annotated_Test.jpg"
+        assert call_kwargs['filename'] == "text_added_Test.jpg"
         assert call_kwargs['artifact'].inline_data.mime_type == "image/jpeg"
 
-async def test_draw_bounding_box_invalid_box_format():
+async def test_add_text_to_image_invalid_loc_format():
     tool_context = MagicMock(spec=ToolContext)
     
     with patch("agents.meme_agent.tools.image_editor.Path.exists", return_value=True), \
@@ -58,53 +58,53 @@ async def test_draw_bounding_box_invalid_box_format():
         mock_img.mode = "RGB"
         mock_open.return_value.__enter__.return_value = mock_img
 
-        result = await draw_bounding_box(
+        result = await add_text_to_image(
             image_filename="Test.jpg",
-            boxes=[[10, 10]], # Invalid inner list length
+            text_locations=[[10]], # Invalid inner list length
             texts=["Test"],
             font_sizes=[10],
             tool_context=tool_context
         )
         
-    assert "Error: Invalid box coordinates" in result
+    assert "Error: Invalid location" in result
 
-async def test_draw_bounding_box_mismatch_lengths():
+async def test_add_text_to_image_mismatch_lengths():
     tool_context = MagicMock(spec=ToolContext)
     
-    result = await draw_bounding_box(
+    result = await add_text_to_image(
         image_filename="Test.jpg",
-        boxes=[[10, 10, 50, 50]],
+        text_locations=[[10, 10]],
         texts=["Test"],
-        font_sizes=[10, 20], # Mismatch length (2 vs 1)
+        font_sizes=[10, 20], # Mismatch length
         tool_context=tool_context
     )
     
-    assert "Error: The number of boxes, texts, and font_sizes must match" in result
+    assert "Error: The number of locations, texts, and font_sizes must match" in result
 
-async def test_draw_bounding_box_too_many():
+async def test_add_text_to_image_too_many():
     tool_context = MagicMock(spec=ToolContext)
     
-    boxes = [[0,0,1,1]] * 5
+    locs = [[0,0]] * 5
     texts = ["t"] * 5
     sizes = [10] * 5
     
-    result = await draw_bounding_box(
+    result = await add_text_to_image(
         image_filename="Test.jpg",
-        boxes=boxes,
+        text_locations=locs,
         texts=texts,
         font_sizes=sizes,
         tool_context=tool_context
     )
     
-    assert "Error: You can provide at most 4 bounding boxes" in result
+    assert "Error: You can provide at most 4 text overlays" in result
 
-async def test_draw_bounding_box_no_file():
+async def test_add_text_to_image_no_file():
     tool_context = MagicMock(spec=ToolContext)
     
     with patch("agents.meme_agent.tools.image_editor.Path.exists", return_value=False):
-        result = await draw_bounding_box(
+        result = await add_text_to_image(
             image_filename="NonExistent.jpg",
-            boxes=[[0,0,10,10]],
+            text_locations=[[0,0]],
             texts=["Test"],
             font_sizes=[10],
             tool_context=tool_context
