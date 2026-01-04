@@ -14,7 +14,7 @@ api_base_url = "https://openrouter.ai/api/v1"
 
 root_agent = Agent(
     model=LiteLlm(
-        model="openrouter/google/gemini-3-flash-preview",
+        model="openrouter/x-ai/grok-4.1-fast",
         api_base=api_base_url,
         api_key=os.getenv("OPENROUTER_API_KEY"),
     ),
@@ -27,12 +27,14 @@ root_agent = Agent(
     You can load meme template images from the local dataset and save them as artifacts
     using 'fetch_image_tool'.
     To view or analyze saved artifacts (like images), you MUST use 'load_artifacts'.
-    Always use the 'load_artifacts' right after 'fetch_image_tool' tool to view the images
-    you have saved.
+    
     You can also add text overlays to images using 'add_text_to_image_tool'. Use Impact font 
     and provide locations (top-left coordinates), texts, and font sizes.
-
-    After you create the meme load it again and verify the text and quality, if not good create again.
+    Note: 'fetch_image_tool' returns the image directly to you so use it before writing any
+    text on the image
+    so that you can see the image before adding text.
+    After you create the meme load it again and verify the text and quality,
+    if not good create again, repeat until perfect.
     """,
     # Register the sub-agent structurally
     # sub_agents=[researcher_agent()],

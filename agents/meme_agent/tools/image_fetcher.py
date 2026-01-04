@@ -5,13 +5,12 @@ from google.genai import types
 from PIL import Image
 
 
-async def fetch_image_tool(image_filename: str, tool_context: ToolContext) -> str:
+async def fetch_image_tool(image_filename: str, tool_context: ToolContext) -> list[str | types.Part]:
     """Loads a meme template image from the local dataset using its exact filename
     and saves it as an artifact.
 
-    If you have used this tool always call load_artifacts tool to view the images you have saved.
-    This tool returns the image directly to user and loads it as an artifact, so user can see
-    it but you can't. Therefore, always use the load_artifacts tool.
+    This tool returns the image directly to you and also saves it as an artifact.
+    You do NOT need to call 'load_artifacts' after this tool.
 
     Args:
         image_filename: The exact filename of the meme image (e.g., 'Doge.jpg', '10-Guy.jpg').
@@ -20,10 +19,10 @@ async def fetch_image_tool(image_filename: str, tool_context: ToolContext) -> st
         tool_context: Internal context for artifact management.
 
     Returns:
-        A success message with image dimensions or an error message.
+        A list containing a success message and the image data as a Part.
     """
     if not image_filename:
-        return "Error: No image filename provided."
+        return ["Error: No image filename provided."]
 
     # Base directory for meme images
     images_dir = Path("data/meme_dataset/templates/img")
@@ -32,11 +31,11 @@ async def fetch_image_tool(image_filename: str, tool_context: ToolContext) -> st
     image_path = images_dir / image_filename
 
     if not image_path.exists():
-        return (
+        return [
             f"Error: Meme template image '{image_filename}' not found in {images_dir}. "
             "Please ensure you are using the 'image_filename' exactly as provided by "
             "'meme_info_tool'."
-        )
+        ]
 
     try:
         # Read the image file
@@ -58,14 +57,16 @@ async def fetch_image_tool(image_filename: str, tool_context: ToolContext) -> st
         # Use filename as the artifact name for easy reference
         version = await tool_context.save_artifact(filename=filename, artifact=artifact_part)
 
-        return (
-            f"Successfully loaded '{filename}' from local dataset as artifact "
-            f"(version {version}). Dimensions: {width}x{height} (Width x Height). "
-            "You can now use 'load_artifacts' to view it."
-        )
+        return [
+            (
+                f"Successfully loaded '{filename}' from local dataset as artifact "
+                f"(version {version}). Dimensions: {width}x{height} (Width x Height)."
+            ),
+            artifact_part,
+        ]
 
     except Exception as e:
-        return f"Error loading image: {str(e)}"
+        return [f"Error loading image: {str(e)}"]
 
 
 fetch_image_tool = function_tool.FunctionTool(fetch_image_tool)
