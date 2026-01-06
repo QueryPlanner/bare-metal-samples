@@ -54,6 +54,10 @@ For production or clean local environments, use Docker.
 - **Tools**: Add functions to `agents/<your_agent>/tools/`
 - **Main Logic**: Edit `agents/<your_agent>/agent.py`
 
+## Available Agents
+
+- **GitHub Wizard** (`agents/github_wizard`): An agent equipped with GitHub MCP tools to assist with repository tasks. Requires `GITHUB_TOKEN`.
+
 ## Why not `adk web --session_service_uri ...`?
 
 ADK’s CLI defaults to local SQLite session storage unless you pass
